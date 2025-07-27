@@ -1,27 +1,26 @@
-// app/admin/layout.tsx
 import Link from 'next/link';
 import { ReactNode } from 'react';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  // Mock authentication check (replace with real middleware)
-  const isAuthenticated = true; // Example; use real auth logic
+  // Mock authentication check (replace with real middleware later)
+  const isAuthenticated = true;
   if (!isAuthenticated) return <div>Access Denied</div>;
 
   return (
     <div>
       <nav className="bg-blue-800 text-white p-4">
         <ul className="flex space-x-4">
-          <li><Link href="/admin"><a>Dashboard</a></Link></li>
-          <li><Link href="/admin/products"><a>Products</a></Link></li>
-          <li><Link href="/admin/orders"><a>Orders</a></Link></li>
-          <li><Link href="/admin/customers"><a>Customers</a></Link></li>
-          <li><Link href="/admin/promotions"><a>Promotions</a></Link></li>
-          <li><Link href="/admin/content"><a>Content</a></Link></li>
-          <li><Link href="/admin/reports"><a>Reports</a></Link></li>
-          <li><Link href="/admin/settings"><a>Settings</a></Link></li>
+          <li><Link href="/admin">Dashboard</Link></li>
+          <li><Link href="/admin/products">Products</Link></li>
+          <li><Link href="/admin/orders">Orders</Link></li>
+          <li><Link href="/admin/customers">Customers</Link></li>
+          <li><Link href="/admin/promotions">Promotions</Link></li>
+          <li><Link href="/admin/content">Content</Link></li>
+          <li><Link href="/admin/reports">Reports</Link></li>
+          <li><Link href="/admin/settings">Settings</Link></li>
         </ul>
       </nav>
-      {children}
+      <main>{children}</main>
     </div>
   );
 }

@@ -1,30 +1,33 @@
 'use client';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+// Mock data for sales analytics
+const salesData = [
+  { month: 'Aug 24', sales: 4000 },
+  { month: 'Sep 24', sales: 3000 },
+  { month: 'Oct 24', sales: 2000 },
+  { month: 'Nov 24', sales: 2780 },
+  { month: 'Dec 24', sales: 1890 },
+  { month: 'Jan 25', sales: 2390 },
+  { month: 'Feb 25', sales: 3490 },
+  { month: 'Mar 25', sales: 4300 },
+  { month: 'Apr 25', sales: 3100 },
+  { month: 'May 25', sales: 4800 },
+  { month: 'Jun 25', sales: 3800 },
+  { month: 'Jul 25', sales: 4350 },
+];
 
 export default function AnalyticsChart() {
-  const data = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Sales ($)',
-        data: [1200, 1900, 3000, 5000, 2300, 3400],
-        backgroundColor: 'rgba(59, 130, 246, 0.5)',
-        borderColor: 'rgba(59, 130, 246, 1)',
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: { position: 'top' as const },
-      title: { display: true, text: 'Monthly Sales' },
-    },
-  };
-
-  return <Bar data={data} options={options} />;
+  return (
+    <ResponsiveContainer width="100%" height={400}>
+      <BarChart data={salesData}>
+        <XAxis dataKey="month" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="sales" fill="#8884d8" />
+      </BarChart>
+    </ResponsiveContainer>
+  );
 }

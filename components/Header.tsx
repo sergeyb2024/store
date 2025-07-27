@@ -1,52 +1,52 @@
 'use client';
+
 import Link from 'next/link';
-import { useState, useContext, createContext } from 'react';
+// Add `useContext` to the import list here
+import { createContext, useState, ReactNode, useContext } from 'react'; 
 import { CartItem } from '../types/product';
 
-// Define and export CartContext
-export const CartContext = createContext<{
-  cart: CartItem[];
-  setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
-}>({ cart: [], setCart: () => {} });
+// Create a context for the shopping cart
+export const CartContext = createContext({
+  cart: [] as CartItem[],
+  setCart: (cart: CartItem[] | ((prev: CartItem[]) => CartItem[])) => {},
+});
 
-export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
-  return <CartContext.Provider value={{ cart, setCart }}>{children}</CartContext.Provider>;
+
+  return (
+    <CartContext.Provider value={{ cart, setCart }}>
+      {children}
+    </CartContext.Provider>
+  );
 };
 
 export default function Header() {
   const { cart } = useContext(CartContext);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-
-  const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <header className="bg-blue-600 text-white p-4 sticky top-0 z-10">
+    <header className="bg-gray-800 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold">
+        <Link href="/" className="text-xl font-bold">
           Hobby Shop
         </Link>
-        <nav className="space-x-4">
-          <Link href="/categories" className="hover:underline">
-            Categories
-          </Link>
-          <Link href="/account" className="hover:underline">
-            Account
-          </Link>
-          <Link href="/cart" className="hover:underline">
-            Cart ({cartItemCount})
-          </Link>
-          <Link href="/admin" className="hover:underline">
-            Admin
-          </Link>
+        <nav>
+          <ul className="flex space-x-4">
+            <li><Link href="/">Home</Link></li>
+            <li><Link href="/admin">Admin</Link></li>
+            <li>
+              <Link href="/checkout" className="relative">
+                Cart 
+                {itemCount > 0 && (
+                  <span className="absolute -top-2 -right-4 bg-red-600 text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
+            </li>
+          </ul>
         </nav>
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="p-2 rounded text-black"
-          value={searchQuery}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-        />
       </div>
     </header>
   );

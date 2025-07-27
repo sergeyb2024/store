@@ -1,20 +1,20 @@
 export interface Product {
-  productId: string;
-  manufacturer: string;
-  modelNumber: string;
-  name: string;
-  category: string;
-  subCategory: string;
-  scale: string | null;
-  description: string;
-  imageURL: string;
-  quantityInStock: number;
-  sellers: Record<string, any>;
-  price?: number;
+    productId: string;
+    name: string;
+    manufacturer: string;
+    modelNumber: string;
+    category: string;
+    subCategory: string;
+    scale?: string | null; // Can be string or null
+    description: string;
+    imageURL: string;
+    quantityInStock: number;
+    price?: number; // Added price as optional for cart functionality
+    sellers: {}; // Added sellers property
 }
 
 export interface CartItem extends Product {
-  quantity: number;
+    quantity: number;
 }
 
 export interface Order {

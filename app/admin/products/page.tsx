@@ -1,12 +1,12 @@
 import Link from 'next/link';
-import { Product } from '../../types/product';
-import ProductForm from '../../components/admin/ProductForm';
-// FIX: Corrected the import path to point to the right directory
-import { addProduct } from '../actions'; 
+import { Product } from '../../../types/product';
+import ProductForm from '../../../components/admin/ProductForm';
+import { addProduct } from '../../../actions'; // Import the server action
 
 async function getProducts(): Promise<Product[]> {
   const res = await fetch('http://localhost:3000/api/products', { cache: 'no-store' });
   if (!res.ok) {
+    // Return an empty array or throw an error to avoid crashing the page
     console.error('Failed to fetch products');
     return [];
   }
@@ -21,6 +21,10 @@ export default async function AdminProductsListPage() {
       <h1 className="text-3xl font-bold mb-6">Manage Products</h1>
 
       <div className="mb-8">
+        {/*
+          FIX: The 'addProduct' server action is now passed directly
+          to the 'formAction' prop, which is what the component expects.
+        */}
         <ProductForm formAction={addProduct} isEditing={false} />
       </div>
       

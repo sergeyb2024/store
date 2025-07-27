@@ -1,58 +1,46 @@
-'use client';
-import { useState, useEffect } from 'react';
-import ProductForm from '../../../../components/admin/ProductForm';
 import { Product } from '../../../../types/product';
-import { revalidatePath } from 'next/cache';
+import ProductForm from '../../../../components/admin/ProductForm';
+import { updateProduct, deleteProduct } from '../../../../actions'; // Import server actions
+import Link from 'next/link';
 
-async function fetchProducts(): Promise<Product[]> {
-  const res = await fetch('/api/products', { cache: 'no-store' });
-  return res.json();
+async function getProduct(productId: string): Promise<Product | null> {
+    const res = await fetch('http://localhost:3000/api/products', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const products: Product[] = await res.json();
+    return products.find(p => p.productId === productId) || null;
 }
 
-async function deleteProduct(productId: string) {
-  'use server';
-  const fs = require('fs').promises;
-  const path = require('path');
-  const filePath = path.join(process.cwd(), 'data/products.json');
-  const data = JSON.parse(await fs.readFile(filePath, 'utf-8'));
-  data.modelKits = data.modelKits?.filter((p: Product) => p.productId !== productId) || [];
-  data.paintsAndSupplies = data.paintsAndSupplies?.filter((p: Product) => p.productId !== productId) || [];
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-  revalidatePath('/admin/products');
+interface ProductEditPageProps {
+    params: { productId: string; };
 }
 
-export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [showForm, setShowForm] = useState(false);
+export default async function ProductEditPage({ params }: ProductEditPageProps) {
+    const product = await getProduct(params.productId);
 
-  useEffect(() => {
-    fetchProducts().then(setProducts);
-  }, []);
+    if (!product) {
+        return (
+            <div className="container mx-auto p-4">
+                <h1 className="text-2xl text-red-600">Product not found</h1>
+                <Link href="/admin/products" className="text-blue-600 hover:underline mt-4 inline-block">&larr; Back to all products</Link>
+            </div>
+        );
+    }
+    
+    // Bind the productId to the update action
+    const updateProductAction = updateProduct.bind(null, product.productId);
 
-  return (
-    <main className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Manage Products</h1>
-      <button
-        className="bg-blue-600 text-white p-2 rounded mb-4"
-        onClick={() => setShowForm(!showForm)}
-      >
-        {showForm ? 'Cancel' : 'Add Product'}
-      </button>
-      {showForm && <ProductForm onSubmit={() => setShowForm(false)} />}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {products.map(product => (
-          <div key={product.productId} className="bg-white p-4 rounded shadow">
-            <h2 className="text-lg font-semibold">{product.name}</h2>
-            <p className="text-sm text-gray-600">{product.manufacturer} - {product.scale}</p>
-            <p className="text-sm">{product.category} / {product.subCategory}</p>
-            <p className="text-green-600">${product.price?.toFixed(2)}</p>
-            <p>In Stock: {product.quantityInStock}</p>
-            <form action={deleteProduct.bind(null, product.productId)}>
-              <button className="mt-2 bg-red-600 text-white p-2 rounded">Delete</button>
-            </form>
-          </div>
-        ))}
-      </div>
-    </main>
-  );
+    return (
+        <main className="container mx-auto p-4">
+            <Link href="/admin/products" className="text-blue-600 hover:underline mb-6 inline-block">&larr; Back to all products</Link>
+            
+            <ProductForm formAction={updateProductAction} productData={product} isEditing={true} />
+
+            <div className="mt-8 border-t pt-4 border-red-300">
+                <h2 className="text-xl font-semibold text-red-700">Danger Zone</h2>
+                <form action={deleteProduct.bind(null, product.productId)}>
+                    <button type="submit" className="mt-2 bg-red-600 text-white p-2 rounded hover:bg-red-700">Delete This Product</button>
+                </form>
+            </div>
+        </main>
+    );
 }
